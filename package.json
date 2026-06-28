@@ -1,0 +1,23 @@
+{
+  "name": "auction-backend",
+  "version": "1.0.0",
+  "description": "FC 26 Live Multiplayer Auction API",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "db:init": "node src/scripts/runInitDb.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "multer": "^2.2.0",
+    "mysql2": "^3.11.0",
+    "socket.io": "^4.7.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
