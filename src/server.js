@@ -16,9 +16,15 @@ async function bootstrap() {
   const app = createApp();
   const server = http.createServer(app);
 
+  const allowedOrigin = (process.env.CLIENT_URL || '*').replace(/\/$/, '');
   const io = new Server(server, {
     cors: {
-      origin: process.env.CLIENT_URL || '*',
+      origin: allowedOrigin === '*'
+        ? '*'
+        : (origin, cb) => {
+            const norm = (origin || '').replace(/\/$/, '');
+            norm === allowedOrigin ? cb(null, true) : cb(new Error(`CORS: blocked ${origin}`));
+          },
       methods: ['GET', 'POST'],
     },
   });
