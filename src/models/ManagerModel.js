@@ -26,6 +26,14 @@ class ManagerModel {
     return result.rows[0] || null;
   }
 
+  static async findByName(sessionId, name) {
+    const result = await query(
+      'SELECT * FROM managers WHERE session_id = ? AND LOWER(name) = LOWER(?)',
+      [sessionId, name]
+    );
+    return result.rows[0] || null;
+  }
+
   static async countAdmins(sessionId) {
     const result = await query(
       "SELECT COUNT(*) AS cnt FROM managers WHERE session_id = ? AND role = 'admin'",

@@ -254,14 +254,28 @@ class GameService {
   // ─── Register ───────────────────────────────────────────────────────────────
 
   async registerManager(socketId, name, token) {
-    // If token already in DB → restore session (reconnect via lobby)
+    // 1. Token match → restore session silently (reconnect via lobby)
     if (token) {
       const existing = await ManagerModel.findByToken(this.session.id, token);
       if (existing) {
         await ManagerModel.update(existing.id, { socket_id: socketId });
+        this.registerSocket(socketId, existing.role, existing.id, existing.name);
         await this.broadcastState();
         return { role: existing.role, name: existing.name };
       }
+    }
+
+    // 2. Name already taken → log in as that manager instead of creating a duplicate
+    const existingByName = await ManagerModel.findByName(this.session.id, name);
+    if (existingByName) {
+      // Update socket and token so this device now owns the slot
+      await ManagerModel.update(existingByName.id, {
+        socket_id: socketId,
+        ...(token ? { client_token: token } : {}),
+      });
+      this.registerSocket(socketId, existingByName.role, existingByName.id, existingByName.name);
+      await this.broadcastState();
+      return { role: existingByName.role, name: existingByName.name };
     }
 
     const managers = await ManagerModel.findBySession(this.session.id);
